@@ -39,17 +39,17 @@ services:
       - ./docker-config/mariadb/data/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./docker-config/mariadb/data/sql:/docker-entrypoint-initdb.d
 
-  # phpmyadmin:
-  #   container_name: myapp-phpmyadmin
-  #   image: phpmyadmin/phpmyadmin
-  #   environment:
-  #     - PMA_ARBITRARY=1
-  #     - PMA_HOST=mysql
-  #     - PMA_USER=${MYSQL_USER}
-  #     - PMA_PASSWORD=${MYSQL_PASSWORD}
-  #   links:
-  #     - mariadb
-  #   ports:
-  #     - 8081:80
-  #   volumes:
-  #     - /sessions
+  phpmyadmin:
+    container_name: myapp-phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=myapp-mariadb
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
+    links:
+      - mariadb
+    ports:
+      - 8081:80
+    volumes:
+      - /sessions
