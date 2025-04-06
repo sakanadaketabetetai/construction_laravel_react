@@ -29,7 +29,7 @@
     PHPを使って、Laravelというツールをセットアップ（インストール）します。
 
     ```
-    composer create-project --prefer-dist laravel/laravel my-app
+    composer install
     ```
 
 5. phpコンテナから出る
@@ -41,19 +41,66 @@
 6. docker-compose.ymlを編集する
 設定ファイル（docker-compose.yml）を変更して、プロジェクトの設定を更新します。以下のようにvolumesセクションを編集してください。
 
-  web: 
-    volumes:
-    - - .:/var/www/
-    + - ./my-app:/var/www/
+    web: 
+        volumes:
+        - - .:/var/www/
+        + - ./my-app:/var/www/
 
-  nginx: 
-    volumes:
-    - - .:/var/www/
-    + - ./my-app:/var/www/
+    nginx: 
+        volumes:
+        - - .:/var/www/
+        + - ./my-app:/var/www/
  
 再度docker composeで立ち上げる
 更新した設定で、もう一度プログラムを起動します。
 
 ```
 docker-compose up -d
+```
+
+7. myapp-phpコンテナに入り、.envファイルを作成
+```
+docker exec -it myapp-php bash
+```
+又は
+```
+docker-compose exec web bash
+```
+そのあと.env.exampleをコピーして、.envファイルを作成
+```
+cp .env.example .env
+```
+
+8. .envファイルを修正
+タイムゾーン及び言語設定
+```
+APP_TIMEZONE=Asia/Tokyo
+APP_LOCALE=ja
+APP_FALLBACK_LOCALE=ja
+APP_FAKER_LOCALE=ja_JP
+
+```
+データベースの設定
+```
+DB_CONNECTION=mysql
+DB_HOST=myapp-mariadb
+DB_PORT=3306
+DB_DATABASE=development
+DB_USERNAME=mysql
+DB_PASSWORD=mysql
+```
+
+9. laravel-breezeをインストール
+```
+composer require laravel/breeze
+```
+
+10. reactをインストール
+```
+php artisan breeze:install react
+```
+
+11. reactプラグインをインストール
+```
+npm install --save-dev @vitejs/plugin-react
 ```
