@@ -96,7 +96,7 @@ class CreateServiceCommand extends Command
      */
     private function getServiceClassTemplate(): string
     {
-        return "<?php\n\nnamespace App\\Services\\{$this->className};\n\nclass {$this->className}\n{\n    // Implement your service methods here\n}\n";
+        return "<?php\n\nnamespace App\\Services;\n\nclass {$this->className}\n{\n    // Implement your service methods here\n}\n";
     }
 
     /**
