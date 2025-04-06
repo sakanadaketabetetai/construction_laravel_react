@@ -97,7 +97,7 @@ composer require laravel/breeze
 
 10. reactをインストール
 ```
-php artisan breeze:install react
+php artisan breeze:install react --typescript
 ```
 
 11. reactプラグインをインストール
