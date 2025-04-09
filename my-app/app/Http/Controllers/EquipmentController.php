@@ -19,7 +19,10 @@ class EquipmentController extends Controller
     }
 
     public function list(){
-        return Inertia::render('Equipment/List');
+        $equipments = Equipment::all();
+        return Inertia::render('Equipment/List', [
+            'equipments' => $equipments
+        ]);
     }
 
     public function edit(){

@@ -4,42 +4,9 @@ import { Wrench, AlertCircle, CheckCircle, Shield, Settings } from 'lucide-react
 import { Link } from '@inertiajs/react';
 import { Equipment } from '../../types';
 
-// モックデータ
-const equipmentList: Equipment[] = [
-  {
-    id: 1,
-    name: '油圧ショベル',
-    model: 'ZX200-6',
-    serialNumber: 'HCM123456',
-    manufacturer: '日立建機',
-    status: 'available',
-    equipment_category_id: 1,
-    created_at: '2024-01-15',
-    updated_at: '2024-03-15'
-  },
-  {
-    id: 2,
-    name: 'クローラークレーン',
-    model: 'CC1908S-1',
-    serialNumber: 'TDK789012',
-    manufacturer: '住友建機',
-    status: 'maintenance',
-    equipment_category_id: 2,
-    created_at: '2024-02-01',
-    updated_at: '2024-03-10'
-  },
-  {
-    id: 3,
-    name: 'ブルドーザー',
-    model: 'D61PX-24',
-    serialNumber: 'KMT345678',
-    manufacturer: 'コマツ',
-    status: 'emergency_reserve',
-    equipment_category_id: 3,
-    created_at: '2024-02-15',
-    updated_at: '2024-03-15'
-  }
-];
+interface EquipmentProps {
+  equipments :Equipment[];
+}
 
 const getStatusColor = (status: Equipment['status']) => {
   switch (status) {
@@ -80,7 +47,7 @@ const getStatusText = (status: Equipment['status']) => {
   }
 };
 
-export default function EquipmentList() {
+export default function EquipmentList( {equipments} : EquipmentProps) {
   return (
     <ConstructionLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -128,7 +95,7 @@ export default function EquipmentList() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {equipmentList.map((equipment) => {
+                {equipments.map((equipment) => {
                   const StatusIcon = getStatusIcon(equipment.status);
                   return (
                     <tr key={equipment.id}>
