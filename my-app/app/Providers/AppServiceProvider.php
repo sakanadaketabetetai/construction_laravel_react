@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use App\Repositories\UserRepository;
 use App\Interfaces\UserRepositoryInterface;
+use App\Repositories\EquipmentRepository;
+use App\Interfaces\EquipmentRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -16,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(EquipmentRepositoryInterface::class, EquipmentRepository::class);
     }
 
     /**

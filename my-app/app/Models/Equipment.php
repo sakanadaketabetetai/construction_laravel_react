@@ -13,6 +13,8 @@ class Equipment extends Model
         'manufacturer',
         'status',
         'equipment_category_id',
+        'created_at',
+        'updated_at',
     ];
 
     public function equipmentCategory() {

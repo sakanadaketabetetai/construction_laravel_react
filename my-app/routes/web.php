@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/construction/create', [ConstructionController::class, 'create']);
     Route::get('/equipment', [EquipmentController::class, 'index']);
     Route::get('/equipment/list', [EquipmentController::class, 'list']);
+    Route::get('/equipment/edit', [EquipmentController::class, 'edit']);
+    Route::post('/equipment/create', [EquipmentController::class, 'create']);
 
 });
 
