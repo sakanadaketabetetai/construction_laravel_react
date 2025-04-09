@@ -6,7 +6,7 @@ services:
     ports:
       - '5173:5173'
     volumes:
-      - ./my-app:/var/www/
+      - ./my-app/:/var/www/
     depends_on:
       - mariadb
 
@@ -44,7 +44,7 @@ services:
     image: phpmyadmin/phpmyadmin
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOST=myapp-mariadb
+      - PMA_HOST=my-mariadb
       - PMA_USER=${MYSQL_USER}
       - PMA_PASSWORD=${MYSQL_PASSWORD}
     links:

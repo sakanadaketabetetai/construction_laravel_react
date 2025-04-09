@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command; 
-use Illuminate\Support\Facades\File;
+use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class CreateRepositoryCommand extends Command
 {
@@ -13,7 +13,7 @@ class CreateRepositoryCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:repository {className : The name of the service class}';
+    protected $signature = 'make:repository {className : The name of the repository class}';
 
     /**
      * The console command description.
@@ -23,14 +23,14 @@ class CreateRepositoryCommand extends Command
     protected $description = 'Create a new repository class';
 
     /**
-     * Directory path for services.
+     * Directory path for repositories.
      *
      * @const string
      */
-    private const SERVICES_PATH = 'app/Repositories/';
+    private const REPOSITORIES_PATH = 'app/Repositories/';
 
     /**
-     * The class name of the service to create.
+     * The class name of the repository to create.
      *
      * @var string
      */
@@ -70,7 +70,7 @@ class CreateRepositoryCommand extends Command
     }
 
     /**
-     * Get the full file path of the service class.
+     * Get the full file path of the repository class.
      *
      * @return string
      */
@@ -80,23 +80,23 @@ class CreateRepositoryCommand extends Command
     }
 
     /**
-     * Get the full directory path for service classes.
+     * Get the full directory path for repository classes.
      *
      * @return string
      */
     private function getRepositoryDirectoryPath(): string
     {
-        return base_path(self::SERVICES_PATH);
+        return base_path(self::REPOSITORIES_PATH);
     }
 
     /**
-     * Get the content of the service class.
+     * Get the content of the repository class.
      *
      * @return string
      */
     private function getRepositoryClassTemplate(): string
     {
-        return "<?php\n\nnamespace App\\Repositories;\n\nclass {$this->className}\n{\n    // Implement your service methods here\n}\n";
+        return "<?php\n\nnamespace App\\Repositories;\n\nclass {$this->className}\n{\n    // Implement your repository methods here\n}\n";
     }
 
     /**

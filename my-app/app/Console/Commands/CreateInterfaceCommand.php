@@ -3,8 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class CreateInterfaceCommand extends Command
 {
@@ -13,7 +13,7 @@ class CreateInterfaceCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:interface {className : The name of the service class}';
+    protected $signature = 'make:interface {className : The name of the interface class}';
 
     /**
      * The console command description.
@@ -23,14 +23,14 @@ class CreateInterfaceCommand extends Command
     protected $description = 'Create a new interface class';
 
     /**
-     * Directory path for services.
+     * Directory path for interfaces.
      *
      * @const string
      */
-    private const SERVICES_PATH = 'app/Interfaces/';
+    private const INTERFACES_PATH = 'app/Interfaces/';
 
     /**
-     * The class name of the service to create.
+     * The class name of the interface to create.
      *
      * @var string
      */
@@ -52,7 +52,7 @@ class CreateInterfaceCommand extends Command
     }
 
     /**
-     * Create the repository class file.
+     * Create the interface class file.
      */
     private function createInterfaceClass(): void
     {
@@ -70,7 +70,7 @@ class CreateInterfaceCommand extends Command
     }
 
     /**
-     * Get the full file path of the service class.
+     * Get the full file path of the interface class.
      *
      * @return string
      */
@@ -80,23 +80,23 @@ class CreateInterfaceCommand extends Command
     }
 
     /**
-     * Get the full directory path for service classes.
+     * Get the full directory path for interface classes.
      *
      * @return string
      */
     private function getInterfaceDirectoryPath(): string
     {
-        return base_path(self::SERVICES_PATH);
+        return base_path(self::INTERFACES_PATH);
     }
 
     /**
-     * Get the content of the service class.
+     * Get the content of the interface class.
      *
      * @return string
      */
     private function getInterfaceClassTemplate(): string
     {
-        return "<?php\n\nnamespace App\\Interfaces;\n\nclass {$this->className}\n{\n    // Implement your service methods here\n}\n";
+        return "<?php\n\nnamespace App\\Interfaces;\n\nclass {$this->className}\n{\n    // Implement your interface methods here\n}\n";
     }
 
     /**

@@ -27,8 +27,18 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'employee_id' => ['required', 'string', 'max:6'],
             'password' => ['required', 'string'],
+        ];
+    }
+
+    public function messages(){
+        return [
+            'employee_id.required' => '社員番号は必須です',
+            'employee_id.string' => '社員番号は文字列でなければなりません',
+            'employee_id.max' => '社員番号は6文字以内でなければなりません',
+            'password.required' => 'パスワードは必須です',
+            'password.string' => 'パスワードは文字列でなければなりません',
         ];
     }
 
@@ -41,11 +51,11 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::attempt($this->only('employee_id', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'employee_id' => trans('auth.failed'),
             ]);
         }
 
