@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ConstructionLayout from '@/Layouts/ConstructionLayout';
-import { Wrench, Search, Plus, AlertCircle } from 'lucide-react';
-import { Link, useForm } from '@inertiajs/react';
+import { Wrench, Search, Plus, AlertCircle, Trash2 } from 'lucide-react';
+import { Head, useForm, router } from '@inertiajs/react';
 import type { Equipment, EquipmentCategory } from '../../types';
 
 interface Props {
@@ -9,27 +9,19 @@ interface Props {
   equipment_categories: EquipmentCategory[];
 }
 
-interface FormData {
-  [key: string]: string | number | Equipment['status'];
-  name: string;
-  model: string;
-  serialNumber: string;
-  manufacturer: string;
-  status: Equipment['status'];
-  category_id: number; // Laravel側のカラム名に合わせて変更
-}
-
 export default function EquipmentEdit({ equipment, equipment_categories }: Props) {
   const [searchTerm, setSearchTerm] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  const { data, setData, post, processing, errors, reset } = useForm<FormData>({
+  const { data, setData, post, put, processing, errors, reset } = useForm({
     name: '',
     model: '',
     serialNumber: '',
     manufacturer: '',
-    status: 'available',
-    category_id: equipment_categories[0]?.id || 1
+    status: 'available' as Equipment['status'],
+    equipment_category_id: equipment_categories[0]?.id || 1
   });
 
   const filteredEquipment = equipment.filter(equipment =>
@@ -40,17 +32,62 @@ export default function EquipmentEdit({ equipment, equipment_categories }: Props
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post('/equipment/create', {
-      onSuccess: () => {
-        setShowForm(false);
-        reset();
-      },
+    if (editingId) {
+      put(`/equipment/${editingId}`, {
+        onSuccess: () => {
+          setShowForm(false);
+          setEditingId(null);
+          reset();
+        },
+      });
+    } else {
+      post('/equipment/create', {
+        onSuccess: () => {
+          setShowForm(false);
+          reset();
+        },
+      });
+    }
+  };
+
+  const handleEdit = (equipment: Equipment) => {
+    setEditingId(equipment.id);
+    setData({
+      name: equipment.name,
+      model: equipment.model,
+      serialNumber: equipment.serialNumber,
+      manufacturer: equipment.manufacturer,
+      status: equipment.status,
+      equipment_category_id: equipment.equipment_category_id
     });
+    setShowForm(true);
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingId(null);
+    reset();
+  };
+
+  const handleDelete = (id: number) => {
+    setDeletingId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deletingId) {
+      router.delete(`/equipment/${deletingId}`, {
+        onSuccess: () => {
+          setDeletingId(null);
+        },
+      });
+    }
   };
 
   return (
     <ConstructionLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <Head title="設備情報編集" />
+        
         <header className="mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -83,10 +120,12 @@ export default function EquipmentEdit({ equipment, equipment_categories }: Props
           </div>
         </div>
 
-        {/* 新規登録フォーム */}
+        {/* 新規登録・編集フォーム */}
         {showForm && (
           <div className="mb-8 bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">新規設備登録</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              {editingId ? '設備情報編集' : '新規設備登録'}
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -178,13 +217,13 @@ export default function EquipmentEdit({ equipment, equipment_categories }: Props
                 </div>
 
                 <div>
-                  <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="equipment_category_id" className="block text-sm font-medium text-gray-700 mb-2">
                     設備カテゴリ <span className="text-red-500">*</span>
                   </label>
                   <select
-                    id="category_id"
-                    value={data.category_id}
-                    onChange={e => setData('category_id', Number(e.target.value))}
+                    id="equipment_category_id"
+                    value={data.equipment_category_id}
+                    onChange={e => setData('equipment_category_id', Number(e.target.value))}
                     className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   >
@@ -194,8 +233,8 @@ export default function EquipmentEdit({ equipment, equipment_categories }: Props
                       </option>
                     ))}
                   </select>
-                  {errors.category_id && (
-                    <p className="mt-1 text-sm text-red-600">{errors.category_id}</p>
+                  {errors.equipment_category_id && (
+                    <p className="mt-1 text-sm text-red-600">{errors.equipment_category_id}</p>
                   )}
                 </div>
               </div>
@@ -208,10 +247,7 @@ export default function EquipmentEdit({ equipment, equipment_categories }: Props
                 <div className="flex gap-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowForm(false);
-                      reset();
-                    }}
+                    onClick={handleCancel}
                     className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
                   >
                     キャンセル
@@ -221,7 +257,7 @@ export default function EquipmentEdit({ equipment, equipment_categories }: Props
                     disabled={processing}
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                   >
-                    {processing ? '登録中...' : '登録する'}
+                    {processing ? (editingId ? '更新中...' : '登録中...') : (editingId ? '更新する' : '登録する')}
                   </button>
                 </div>
               </div>
@@ -278,15 +314,16 @@ export default function EquipmentEdit({ equipment, equipment_categories }: Props
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-3">
                         <button
-                          onClick={() => {/* 編集処理 */}}
+                          onClick={() => handleEdit(equipment)}
                           className="text-blue-600 hover:text-blue-900"
                         >
                           編集
                         </button>
                         <button
-                          onClick={() => {/* 削除処理 */}}
-                          className="text-red-600 hover:text-red-900"
+                          onClick={() => handleDelete(equipment.id)}
+                          className="text-red-600 hover:text-red-900 flex items-center"
                         >
+                          <Trash2 className="w-4 h-4 mr-1" />
                           削除
                         </button>
                       </div>
@@ -297,6 +334,33 @@ export default function EquipmentEdit({ equipment, equipment_categories }: Props
             </table>
           </div>
         </div>
+
+        {/* 削除確認モーダル */}
+        {deletingId && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">設備情報の削除</h3>
+              <p className="text-gray-600 mb-6">
+                この設備情報を削除してもよろしいですか？
+                この操作は取り消すことができません。
+              </p>
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => setDeletingId(null)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                >
+                  キャンセル
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  削除する
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </ConstructionLayout>
   );

@@ -40,4 +40,15 @@ class EquipmentController extends Controller
         $this->equipmentRepository->createEquipment($equipment_data);
         return redirect('/equipment/edit')->with('success', 'Equipment created successfully');
     }
+
+    public function update(Request $request, $id){
+        $equipment_data = $request->all();
+        $this->equipmentRepository->updateEquipment($equipment_data, $id);
+        return redirect('/equipment/edit')->with('success', 'Equipment updated successfully');
+    }
+
+    public function delete($id){
+        $this->equipmentRepository->deleteEquipment($id);
+        return redirect('/equipment/edit')->with('success', 'Equipment deleted successfully');
+    }
 }

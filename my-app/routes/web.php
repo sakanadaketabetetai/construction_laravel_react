@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/equipment/list', [EquipmentController::class, 'list']);
     Route::get('/equipment/edit', [EquipmentController::class, 'edit']);
     Route::post('/equipment/create', [EquipmentController::class, 'create']);
+    Route::put('/equipment/{id}', [EquipmentController::class, 'update']);
+    Route::delete('/equipment/{id}', [EquipmentController::class, 'delete']);
 
 });
 
