@@ -96,7 +96,7 @@ class CreateInterfaceCommand extends Command
      */
     private function getInterfaceClassTemplate(): string
     {
-        return "<?php\n\nnamespace App\\Interfaces;\n\nclass {$this->className}\n{\n    // Implement your interface methods here\n}\n";
+        return "<?php\n\nnamespace App\\Interfaces;\n\ninterface {$this->className}\n{\n    // Implement your interface methods here\n}\n";
     }
 
     /**

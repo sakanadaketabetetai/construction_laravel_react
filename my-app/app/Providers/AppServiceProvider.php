@@ -9,6 +9,12 @@ use App\Repositories\UserRepository;
 use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\EquipmentRepository;
 use App\Interfaces\EquipmentRepositoryInterface;
+use App\Repositories\InspectionTemplateRepository;
+use App\Interfaces\InspectionTemplateRepositoryInterface;
+use App\Repositories\EquipmentRecordRepository;
+use App\Interfaces\EquipmentRecordRepositoryInterface;
+use App\Repositories\EquipmentCategoryRepository;
+use App\Interfaces\EquipmentCategoryRepositoryInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(EquipmentRepositoryInterface::class, EquipmentRepository::class);
+        $this->app->bind(InspectionTemplateRepositoryInterface::class, InspectionTemplateRepository::class);
+        $this->app->bind(EquipmentRecordRepositoryInterface::class, EquipmentRecordRepository::class);
+        $this->app->bind(EquipmentCategoryRepositoryInterface::class, EquipmentCategoryRepository::class);
     }
 
     /**

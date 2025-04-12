@@ -34,7 +34,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/equipment/create', [EquipmentController::class, 'create']);
     Route::put('/equipment/{id}', [EquipmentController::class, 'update']);
     Route::delete('/equipment/{id}', [EquipmentController::class, 'delete']);
-
+    Route::get('/equipment/inspections', [EquipmentController::class, 'inspections']);
+    Route::get('/equipment/inspections/templates/create', [EquipmentController::class, 'inspections_templates']);
+    Route::post('/equipment/inspections/templates/create', [EquipmentController::class,'create_inspection_template']);
 });
 
 require __DIR__.'/auth.php';

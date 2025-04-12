@@ -5,15 +5,30 @@ namespace App\Http\Controllers;
 use App\Models\Equipment;
 use App\Models\EquipmentCategory;
 use App\Interfaces\EquipmentRepositoryInterface;
+
+use App\Interfaces\InspectionTemplateRepositoryInterface;
+use App\Models\EquipmentRecord;
+use App\Interfaces\EquipmentRecordRepositoryInterface;
+use App\Repositories\EquipmentRecordRepository;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class EquipmentController extends Controller
 {
     private $equipmentRepository;
-    public function __construct(EquipmentRepositoryInterface $equipmentRepository){
+    private $inspectionRepository;
+    private $equipmentRecordRepository;
+    public function __construct(
+        EquipmentRepositoryInterface $equipmentRepository,
+        InspectionTemplateRepositoryInterface $inspectionRepository,
+        EquipmentRecordRepositoryInterface $equipmentRecordRepository){
         $this->equipmentRepository = $equipmentRepository;
+        $this->inspectionRepository = $inspectionRepository;
+        $this->equipmentRecordRepository = $equipmentRecordRepository;
     }
+
+
+
     public function index(){
         return Inertia::render('Equipment/Equipment');
     }
@@ -50,5 +65,23 @@ class EquipmentController extends Controller
     public function delete($id){
         $this->equipmentRepository->deleteEquipment($id);
         return redirect('/equipment/edit')->with('success', 'Equipment deleted successfully');
+    }
+
+    public function inspections() {
+        $equipments = $this->equipmentRepository->getEquipment();
+        $inspection_templates = $this->inspectionRepository->getInspectionTemplates();
+        $inspection__records = $this->equipmentRecordRepository->getEquipmentRecords();
+        return Inertia::render('Equipment/Inspections/index', [
+            'equipments' => $equipments,
+            'templates' => $inspection_templates,
+            'inspectionRecords' => $inspection__records,
+        ]);
+    }
+
+    public function inspections_templates() {
+        $equipment_categories = EquipmentCategory::all();
+        return Inertia::render('Equipment/Inspections/Templates/Create', [
+            'equipment_categories' => $equipment_categories,
+        ]);
     }
 }

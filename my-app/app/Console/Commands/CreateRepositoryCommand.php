@@ -90,13 +90,14 @@ class CreateRepositoryCommand extends Command
     }
 
     /**
+     * 
      * Get the content of the repository class.
      *
      * @return string
      */
     private function getRepositoryClassTemplate(): string
     {
-        return "<?php\n\nnamespace App\\Repositories;\n\nclass {$this->className}\n{\n    // Implement your repository methods here\n}\n";
+        return "<?php\n\nnamespace App\\Repositories;\n\nclass {$this->className} implements {$this->className}Interface \n{\n    // Implement your repository methods here\n}\n";
     }
 
     /**

@@ -2,10 +2,10 @@
 
 namespace App\Interfaces;
 
-use App\Repositories\EquipmentRepository;
 
 interface EquipmentRepositoryInterface
 {
+    public function getEquipment();
     public function createEquipment(array $data);
     public function updateEquipment(array $data, $equipmentId);
     public function deleteEquipment($equipmentId);

@@ -6,6 +6,9 @@ use App\Interfaces\EquipmentRepositoryInterface;
 
 class EquipmentRepository implements EquipmentRepositoryInterface
 {
+    public function getEquipment(){
+        return Equipment::all();
+    }
     // Implement your repository methods here
     public function createEquipment(array $data){
         return Equipment::create([
