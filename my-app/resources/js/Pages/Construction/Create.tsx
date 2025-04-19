@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import ConstructionLayout from '@/Layouts/ConstructionLayout';
 import { Building2, Calendar, ClipboardList, AlertCircle } from 'lucide-react';
+import type { Equipment, EquipmentCategory } from '../../types';
+
+interface Props {
+  equipmentCategories: EquipmentCategory[];
+  equipment: Equipment[];
+}
 
 interface FormData {
   title: string;
@@ -9,25 +15,44 @@ interface FormData {
   description: string;
   startDate: string;
   estimatedCompletionDate: string;
+  endDate: string;
   status: 'not_yet_started' | 'ongoing' | 'completed' | 'delayed';
   user_id: number;
-  [key: string]: string | number;
+  equipment_ids: number[];
+  [key: string]: string | number | number[];
 }
 
-export default function CreateConstruction() {
+export default function CreateConstruction({ equipmentCategories = [], equipment = [] }: Props) {
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+
   const { data, setData, post, processing, errors } = useForm<FormData>({
     title: '',
     fiscalYear: new Date().getFullYear(),
     description: '',
     startDate: '',
     estimatedCompletionDate: '',
+    endDate: '',
     status: 'not_yet_started',
-    user_id: 1, // 仮の値、実際にはログインユーザーのIDを使用
+    user_id: 1,
+    equipment_ids: [],
   });
+
+  const filteredEquipment = useMemo(() => {
+    if (!selectedCategory) return equipment;
+    return equipment.filter(e => e.equipment_category_id === selectedCategory);
+  }, [equipment, selectedCategory]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('constructions.store'));
+    post('/construction/store');
+  };
+
+  const handleEquipmentSelection = (equipmentId: number) => {
+    const newEquipmentIds = data.equipment_ids.includes(equipmentId)
+      ? data.equipment_ids.filter(id => id !== equipmentId)
+      : [...data.equipment_ids, equipmentId];
+    
+    setData('equipment_ids', newEquipmentIds);
   };
 
   return (
@@ -144,6 +169,30 @@ export default function CreateConstruction() {
                   <p className="mt-1 text-sm text-red-600">{errors.estimatedCompletionDate}</p>
                 )}
               </div>
+
+              {data.status === 'completed' && (
+                <div>
+                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
+                    工事完了日 <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Calendar className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="date"
+                      id="endDate"
+                      value={data.endDate}
+                      onChange={e => setData('endDate', e.target.value)}
+                      className="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                  {errors.endDate && (
+                    <p className="mt-1 text-sm text-red-600">{errors.endDate}</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
@@ -164,6 +213,63 @@ export default function CreateConstruction() {
               </select>
               {errors.status && (
                 <p className="mt-1 text-sm text-red-600">{errors.status}</p>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                使用設備 <span className="text-red-500">*</span>
+              </label>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    設備カテゴリ
+                  </label>
+                  <select
+                    value={selectedCategory || ''}
+                    onChange={e => setSelectedCategory(e.target.value ? parseInt(e.target.value) : null)}
+                    className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">全てのカテゴリ</option>
+                    {equipmentCategories.map(category => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredEquipment.map(equipment => (
+                  <div
+                    key={equipment.id}
+                    className={`
+                      relative p-4 border rounded-lg cursor-pointer transition-all
+                      ${data.equipment_ids.includes(equipment.id)
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-300'}
+                    `}
+                    onClick={() => handleEquipmentSelection(equipment.id)}
+                  >
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={data.equipment_ids.includes(equipment.id)}
+                        onChange={() => handleEquipmentSelection(equipment.id)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-900">{equipment.name}</p>
+                        <p className="text-xs text-gray-500">{equipment.model}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {errors.equipment_ids && (
+                <p className="mt-1 text-sm text-red-600">{errors.equipment_ids}</p>
               )}
             </div>
 

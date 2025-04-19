@@ -9,6 +9,10 @@ class EquipmentRepository implements EquipmentRepositoryInterface
     public function getEquipment(){
         return Equipment::all();
     }
+
+    public function getEquipmentById($equipment_id){
+        return Equipment::find($equipment_id);
+    }
     // Implement your repository methods here
     public function createEquipment(array $data){
         return Equipment::create([

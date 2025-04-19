@@ -1,5 +1,5 @@
 import React from 'react';
-import ConstructionLayout from '@/Layouts/ConstructionLayout';
+import ConstructionLayout from '../../../../Layouts/ConstructionLayout';
 import { ClipboardList, Plus, Minus, AlertCircle } from 'lucide-react';
 import { Head, useForm } from '@inertiajs/react';
 import type { EquipmentCategory } from '../../../../types';
@@ -9,40 +9,39 @@ interface Props {
 }
 
 interface CheckItemForm {
-  [key: string]: string | number | boolean | undefined;
-  description: string;
+  [key: string]: string | number | null | undefined;
+  field_name: string;
   type: 'visual' | 'measurement' | 'functional';
-  required: boolean;
-  min_value?: number;
-  max_value?: number;
-  unit?: string;
+  unit: string;
+  min_value: number | null;
+  max_value: number | null;
 }
 
 interface FormData {
-  [key: string]: string | number | boolean | CheckItemForm[] | undefined;
+  [key: string]: string | number | CheckItemForm[] | undefined;
   name: string;
   equipment_category_id: number;
   description?: string;
   checkItems: CheckItemForm[];
 }
 
-export default function CreateTemplate({ equipment_categories }: Props) {
+export default function CreateTemplate({ equipment_categories = [] }: Props) {
   const { data, setData, post, processing, errors } = useForm<FormData>({
     name: '',
-    equipment_category_id: equipment_categories[0]?.id || 1,
+    equipment_category_id: equipment_categories[0]?.id || 0,
     description: '',
-    checkItems: [{ description: '', type: 'visual', required: true }]
+    checkItems: [{ field_name: '', type: 'visual', unit: '', min_value: null, max_value: null }]
   });
 
   const addCheckItem = () => {
-    setData('checkItems', [...data.checkItems, { description: '', type: 'visual', required: true }]);
+    setData('checkItems', [...data.checkItems, { field_name: '', type: 'visual', unit: '', min_value: null, max_value: null }]);
   };
 
   const removeCheckItem = (index: number) => {
     setData('checkItems', data.checkItems.filter((_, i) => i !== index));
   };
 
-  const updateCheckItem = (index: number, field: keyof CheckItemForm, value: string | boolean | number) => {
+  const updateCheckItem = (index: number, field: keyof CheckItemForm, value: string | number | null) => {
     const newCheckItems = [...data.checkItems];
     newCheckItems[index] = { ...newCheckItems[index], [field]: value };
     setData('checkItems', newCheckItems);
@@ -50,8 +49,34 @@ export default function CreateTemplate({ equipment_categories }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post('/equipment/inspections/templates');
+    post('/equipment/inspections/templates/create');
   };
+
+  if (equipment_categories.length === 0) {
+    return (
+      <ConstructionLayout>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-yellow-50 rounded-lg p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-yellow-400" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">
+                  設備カテゴリが登録されていません
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>
+                    点検テンプレートを作成するには、先に設備カテゴリを登録する必要があります。
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ConstructionLayout>
+    );
+  }
 
   return (
     <ConstructionLayout>
@@ -70,21 +95,45 @@ export default function CreateTemplate({ equipment_categories }: Props) {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                テンプレート名 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={data.name}
-                onChange={e => setData('name', e.target.value)}
-                className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  テンプレート名 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  value={data.name}
+                  onChange={e => setData('name', e.target.value)}
+                  className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+                {errors.name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="equipment_category_id" className="block text-sm font-medium text-gray-700 mb-2">
+                  設備カテゴリ <span className="text-red-500">*</span>
+                </label>
+                <select
+                  id="equipment_category_id"
+                  value={data.equipment_category_id}
+                  onChange={e => setData('equipment_category_id', parseInt(e.target.value))}
+                  className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+                  {equipment_categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.equipment_category_id && (
+                  <p className="mt-1 text-sm text-red-600">{errors.equipment_category_id}</p>
+                )}
+              </div>
             </div>
 
             <div>
@@ -98,25 +147,6 @@ export default function CreateTemplate({ equipment_categories }: Props) {
                 rows={3}
                 className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
-            </div>
-
-            <div>
-              <label htmlFor="equipment_category_id" className="block text-sm font-medium text-gray-700 mb-2">
-                設備カテゴリ <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="equipment_category_id"
-                value={data.equipment_category_id}
-                onChange={e => setData('equipment_category_id', Number(e.target.value))}
-                className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                required
-              >
-                {equipment_categories.map(category => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
             <div className="space-y-4">
@@ -151,12 +181,13 @@ export default function CreateTemplate({ equipment_categories }: Props) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        チェック内容 <span className="text-red-500">*</span>
+                        記録項目名 <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        value={item.description}
-                        onChange={e => updateCheckItem(index, 'description', e.target.value)}
+                        value={item.field_name}
+                        onChange={e => updateCheckItem(index, 'field_name', e.target.value)}
+                        placeholder="例: 温度, 圧力"
                         className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         required
                       />
@@ -170,6 +201,7 @@ export default function CreateTemplate({ equipment_categories }: Props) {
                         value={item.type}
                         onChange={e => updateCheckItem(index, 'type', e.target.value as CheckItemForm['type'])}
                         className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
                       >
                         <option value="visual">目視確認</option>
                         <option value="measurement">計測</option>
@@ -178,56 +210,48 @@ export default function CreateTemplate({ equipment_categories }: Props) {
                     </div>
                   </div>
 
-                  {item.type === 'measurement' && (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          単位
-                        </label>
-                        <input
-                          type="text"
-                          value={item.unit}
-                          onChange={e => updateCheckItem(index, 'unit', e.target.value)}
-                          placeholder="例: ℃, MPa"
-                          className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        単位 <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={item.unit}
+                        onChange={e => updateCheckItem(index, 'unit', e.target.value)}
+                        placeholder="例: ℃, MPa"
+                        className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        required
+                      />
+                    </div>
+
+                    {item.type === 'measurement' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           最小値
                         </label>
                         <input
                           type="number"
-                          value={item.min_value}
-                          onChange={e => updateCheckItem(index, 'min_value', parseFloat(e.target.value))}
+                          value={item.min_value ?? ''}
+                          onChange={e => updateCheckItem(index, 'min_value', e.target.value ? parseFloat(e.target.value) : null)}
                           className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
+                    )}
+
+                    {item.type === 'measurement' && (
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           最大値
                         </label>
                         <input
                           type="number"
-                          value={item.max_value}
-                          onChange={e => updateCheckItem(index, 'max_value', parseFloat(e.target.value))}
+                          value={item.max_value ?? ''}
+                          onChange={e => updateCheckItem(index, 'max_value', e.target.value ? parseFloat(e.target.value) : null)}
                           className="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                    </div>
-                  )}
-
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id={`required-${index}`}
-                      checked={item.required}
-                      onChange={e => updateCheckItem(index, 'required', e.target.checked)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor={`required-${index}`} className="ml-2 block text-sm text-gray-700">
-                      必須項目
-                    </label>
+                    )}
                   </div>
                 </div>
               ))}

@@ -37,5 +37,30 @@ class EquipmentSeeder extends Seeder
             'status' => 'available',
             'equipment_category_id' => 2,
         ]);
+        Equipment::create([
+            'name' => '№1セカンダリーポンプ',
+            'model' => 'PU-211',
+            'serialNumber' => 'BN123456',
+            'manufacturer' => 'メーカーB',
+            'status' => 'available',
+            'equipment_category_id' => 3,
+        ]);
+        Equipment::create([
+            'name' => '№2セカンダリーポンプ',
+            'model' => 'PU-221',
+            'serialNumber' => 'BN123456',
+            'manufacturer' => 'メーカーB',
+            'status' => 'available',
+            'equipment_category_id' => 3,
+        ]);
+        Equipment::create([
+            'name' => '№3セカンダリーポンプ',
+            'model' => 'PU-231',
+            'serialNumber' => 'BN123456',
+            'manufacturer' => 'メーカーB',
+            'status' => 'available',
+            'equipment_category_id' => 3,
+        ]);
+
     }
 }

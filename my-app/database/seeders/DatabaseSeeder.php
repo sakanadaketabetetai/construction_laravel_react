@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             EquipmentCategorySeeder::class,
             EquipmentSeeder::class,
+            InspectionTemplateSeeder::class,
+            InspectionTemplateItemSeeder::class,
         ]);
     }
 }

@@ -27,7 +27,9 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('Dashboard');
     })->middleware(['auth', 'verified'])->name('dashboard');    
     Route::get('/construction', [ConstructionController::class, 'index']);
-    Route::get('/construction/create', [ConstructionController::class, 'create']);
+    Route::get('/construction/list', [ConstructionController::class, 'construction_list']);
+    Route::get('/construction/create', [ConstructionController::class, 'create_page']);
+    Route::post('/construction/store', [ConstructionController::class, 'store']);
     Route::get('/equipment', [EquipmentController::class, 'index']);
     Route::get('/equipment/list', [EquipmentController::class, 'list']);
     Route::get('/equipment/edit', [EquipmentController::class, 'edit']);
@@ -37,6 +39,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/equipment/inspections', [EquipmentController::class, 'inspections']);
     Route::get('/equipment/inspections/templates/create', [EquipmentController::class, 'inspections_templates']);
     Route::post('/equipment/inspections/templates/create', [EquipmentController::class,'create_inspection_template']);
+    Route::get('/equipment/inspections/create', [EquipmentController::class,'equipment_inspection']);
+    Route::post('/equipment/inspections/create', [EquipmentController::class,'create_equipment_inspection']);
+    Route::get('/equipment/inspections/{id}', [EquipmentController::class,'equipment_inspection_detail']);
+    Route::put('/equipment/inspections/{id}', [EquipmentController::class,'update_equipment_inspection']);
+    Route::delete('/equipment/inspections/{id}', [EquipmentController::class,'delete_equipment_inspection']);
 });
 
 require __DIR__.'/auth.php';

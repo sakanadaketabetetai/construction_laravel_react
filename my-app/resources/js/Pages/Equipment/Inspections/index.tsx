@@ -1,47 +1,26 @@
 import React, { useState } from 'react';
-import ConstructionLayout from '@/Layouts/ConstructionLayout';
-import { ClipboardList, Plus, Search, AlertCircle, CheckCircle, XCircle, Clock } from 'lucide-react';
+import ConstructionLayout from '../../../Layouts/ConstructionLayout';
+import { ClipboardList, Plus, Search, Clock } from 'lucide-react';
 import { Head, Link } from '@inertiajs/react';
-import type { InspectionRecord, Equipment, InspectionTemplate } from '../../../types';
+import type { EquipmentRecord, Equipment, InspectionTemplate } from '../../../types';
 
 interface Props {
-  inspectionRecords: InspectionRecord[];
+  equipmentRecords: EquipmentRecord[];
   equipments: Equipment[];
   templates: InspectionTemplate[];
 }
 
-export default function Inspections({ inspectionRecords, equipments, templates }: Props) {
+export default function Inspections({ equipmentRecords = [], equipments = [], templates = [] }: Props) {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const getStatusColor = (status: InspectionRecord['status']) => {
-    switch (status) {
-      case 'passed':
-        return 'bg-green-100 text-green-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      case 'needs_repair':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusIcon = (status: InspectionRecord['status']) => {
-    switch (status) {
-      case 'passed':
-        return CheckCircle;
-      case 'failed':
-        return XCircle;
-      case 'needs_repair':
-        return AlertCircle;
-      default:
-        return Clock;
-    }
-  };
-
-  const filteredRecords = inspectionRecords.filter(record =>
+  const filteredRecords = equipmentRecords.filter(record =>
     equipments.find(e => e.id === record.equipment_id)?.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  console.log('Filtered Records:', filteredRecords);
+  console.log('Equipment:', equipments);
+  console.log('Templates:', templates);
+  console.log('Equipment Records:', equipmentRecords);
 
   return (
     <ConstructionLayout>
@@ -92,27 +71,40 @@ export default function Inspections({ inspectionRecords, equipments, templates }
         {/* テンプレート一覧 */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">点検テンプレート</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {templates.map((template) => (
-              <div
-                key={template.id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200"
+          {templates.length === 0 ? (
+            <div className="bg-gray-50 rounded-lg p-6 text-center">
+              <p className="text-gray-600">テンプレートがまだ登録されていません。</p>
+              <Link
+                href="/equipment/inspections/templates/create"
+                className="inline-flex items-center px-4 py-2 mt-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{template.name}</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  チェック項目: {template.checkItems.length}個
-                </p>
-                <div className="flex justify-end">
-                  <Link
-                    href={`/equipment/inspections/templates/${template.id}/edit`}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                  >
-                    テンプレートを編集
-                  </Link>
+                <Plus className="w-5 h-5 mr-2" />
+                新しいテンプレートを作成
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {templates.map((template) => (
+                <div
+                  key={template.id}
+                  className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{template.name}</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    チェック項目: {template.inspection_template_items.length}個
+                  </p>
+                  <div className="flex justify-end">
+                    <Link
+                      href={`/equipment/inspections/templates/${template.id}/edit`}
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    >
+                      テンプレートを編集
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 点検記録一覧 */}
@@ -122,7 +114,7 @@ export default function Inspections({ inspectionRecords, equipments, templates }
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    点検日
+                    記録日
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     設備名
@@ -131,13 +123,10 @@ export default function Inspections({ inspectionRecords, equipments, templates }
                     テンプレート
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    点検者
+                    試運転時間
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    状態
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    次回点検日
+                    記録数
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     操作
@@ -145,46 +134,51 @@ export default function Inspections({ inspectionRecords, equipments, templates }
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredRecords.map((record) => {
-                  const StatusIcon = getStatusIcon(record.status);
-                  const equipmentName = equipments.find(e => e.id === record.equipment_id)?.name;
-                  const templateName = templates.find(t => t.id === record.template_id)?.name;
+                {filteredRecords.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                      点検記録がありません
+                    </td>
+                  </tr>
+                ) : (
+                  filteredRecords.map((record) => {
+                    const equipmentName = equipments.find(e => e.id === record.equipment_id)?.name;
+                    const templateName = templates.find(t => t.id === record.template_id)?.name;
 
-                  return (
-                    <tr key={record.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{record.inspection_date}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{equipmentName}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{templateName}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">Inspector #{record.inspector_id}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(record.status)}`}>
-                          <StatusIcon className="w-4 h-4 mr-1" />
-                          {record.status === 'passed' ? '合格' :
-                           record.status === 'failed' ? '不合格' : '要修理'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">{record.next_inspection_date}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Link
-                          href={`/equipment/inspections/${record.id}`}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          詳細
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
+                    return (
+                      <tr key={record.id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{record.recorded_at}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{equipmentName}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">{templateName}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Clock className="w-4 h-4 mr-1" />
+                            {record.start_time} 〜 {record.end_time}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {record.record_items.length}件
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <Link
+                            href={`/equipment/inspections/${record.id}`}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            詳細
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>

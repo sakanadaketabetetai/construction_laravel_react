@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('unit')->comment('単位 例:MPa,℃');
             $table->float('min_value')->nullable()->comment('最小値');
             $table->float('max_value')->nullable()->comment('最大値');
+            $table->enum('type', ['visual','measurement','functional'])->comment('確認項目の種類 visual:目視確認, measurement:測定, functional:機能確認');
             $table->timestamps();
         });
     }

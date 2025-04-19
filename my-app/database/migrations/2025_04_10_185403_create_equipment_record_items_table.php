@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('record_id')->constrained('equipment_records')->onDelete('cascade');
             $table->foreignId('template_item_id')->constrained('inspection_template_items')->onDelete('cascade');
+            $table->string('time')->comment('記録時間');
             $table->float('value')->comment('記録値');
-            $table->string('unit')->comment('単位 例:MPa,℃');
             $table->timestamps();
         });
     }
