@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('inspection_templates', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->string('name')->comment('点検記録テンプレート名');
+            $table->text('description')->nullable()->comment('点検テンプレート説明');
             $table->foreignId('equipment_category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

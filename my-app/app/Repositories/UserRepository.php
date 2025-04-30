@@ -17,4 +17,9 @@ class UserRepository implements UserRepositoryInterface
             'employee_id' => $data['employee_id'],
         ]);
     }
+
+    public function getUsers(){
+        $users = User::all();
+        return $users;
+    }
 }

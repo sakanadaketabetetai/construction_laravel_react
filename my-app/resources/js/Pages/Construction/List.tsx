@@ -42,11 +42,21 @@ export default function ConstructionList({ constructions = [], equipmentCategori
       const matchesYear = !selectedYear || construction.fiscalYear === Number(selectedYear);
 
       const matchesEquipment = !selectedEquipment || 
-        construction.equipment?.some(e => e.id === Number(selectedEquipment));
+        construction.equipment_ids.includes(Number(selectedEquipment));
 
       return matchesSearch && matchesYear && matchesEquipment;
     });
   }, [constructions, searchTerm, selectedYear, selectedEquipment]);
+
+  // Helper function to get equipment names from equipment_ids
+  const getEquipmentNames = (equipmentIds: number[]) => {
+    return equipment
+      .filter(eq => equipmentIds.includes(eq.id))
+      .map(eq => ({
+        id: eq.id,
+        name: eq.name
+      }));
+  };
 
   return (
     <ConstructionLayout>
@@ -58,7 +68,7 @@ export default function ConstructionList({ constructions = [], equipmentCategori
               <p className="mt-2 text-gray-600">工事案件の一覧と検索</p>
             </div>
             <Link
-              href={'/constructions/create'}
+              href={'/construction/create'}
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
             >
               <Building2 className="w-5 h-5 mr-2" />
@@ -217,7 +227,7 @@ export default function ConstructionList({ constructions = [], equipmentCategori
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-wrap gap-1">
-                          {construction.equipment?.map((eq) => (
+                          {getEquipmentNames(construction.equipment_ids).map((eq) => (
                             <span
                               key={eq.id}
                               className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
@@ -230,13 +240,13 @@ export default function ConstructionList({ constructions = [], equipmentCategori
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-3">
                           <Link
-                            href={`/constructions/show/${construction.id}`}
+                            href={`/construction/show/${construction.id}`}
                             className="text-blue-600 hover:text-blue-900"
                           >
                             詳細
                           </Link>
                           <Link
-                            href={`/constructions/edit/${construction.id}`}
+                            href={`/construction/edit/${construction.id}`}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
                             編集

@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             EquipmentSeeder::class,
             InspectionTemplateSeeder::class,
             InspectionTemplateItemSeeder::class,
+            ConstructionSeeder::class,
         ]);
     }
 }

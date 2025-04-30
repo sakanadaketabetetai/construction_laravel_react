@@ -3,7 +3,7 @@ import ConstructionLayout from '@/Layouts/ConstructionLayout';
 import { ListFilter, PlusCircle, Calendar, FileText } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 
-export default function Construction() {
+export default function Constructions() {
   const menuItems = [
     {
       title: '工事一覧',
@@ -27,8 +27,8 @@ export default function Construction() {
       color: 'bg-purple-500'
     },
     {
-      title: '工事報告書作成',
-      description: '工事完了報告書の作成',
+      title: '工事報告書',
+      description: '工事報告書の作成・管理',
       icon: FileText,
       href: '/construction/reports',
       color: 'bg-orange-500'

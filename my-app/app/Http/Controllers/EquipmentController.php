@@ -163,4 +163,8 @@ class EquipmentController extends Controller
         $this->equipmentRecordRepository->deleteEquipmentRecord($id);
         return redirect('/equipment/inspections')->with('success', 'Inspection deleted successfully');
     }
+
+    public function inspection_template_detail($id){
+        //テンプレート編集ページを作成
+    }
 }

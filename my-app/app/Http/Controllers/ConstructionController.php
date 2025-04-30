@@ -27,15 +27,14 @@ class ConstructionController extends Controller
         $this->constructionService = $constructionService;
     }
 
-
     public function index(){
         return inertia::render('Construction/Construction');
     }
 
     public function construction_list(){
         $equipmentCategories = $this->equipmentCategoryRepository->getEquipmentCategories();
-        $constructions = $this->constructionRepository->getConstructions();
-        $equipments = $this->equipmentRepository->getEquipment();
+        $constructions = $this->constructionService->getConstructionAndEquipmentIds();
+        $equipments = $this->equipmentRepository->getEquipment(); 
         return inertia::render('Construction/List', [
             'equipment' => $equipments,
             'equipmentCategories' => $equipmentCategories,
@@ -56,6 +55,28 @@ class ConstructionController extends Controller
         $data = $request->all();
         $this->constructionService->createConstructionAndEquipment($data);
         return inertia::render('Construction/Construction');
+    }
+
+    public function edit($id){
+        $construction = $this->constructionService->getConstructionByIdWithEquipment($id);
+        $equipmentCategories = $this->equipmentCategoryRepository->getEquipmentCategories();
+        $equipments = $this->equipmentRepository->getEquipment(); 
+        return inertia::render('Construction/Edit',[
+            'construction' => $construction,
+            'equipment' => $equipments,
+            'equipmentCategories' => $equipmentCategories,
+        ]);
+    }
+
+    public function update(Request $request){
+        $construction = $request->all();
+        $this->constructionService->updateConstructionAndEquipmentId($construction);
+        return redirect('/construction/list')->with('success', 'Inspection template created successfully');
+    }
+
+    public function schedule(){
+        $constructions = $this->constructionRepository->getConstructions();
+        return inertia::render('Construction/Schedule', ['constructions' => $constructions]);
     }
 
 }

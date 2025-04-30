@@ -23,6 +23,20 @@ use App\Interfaces\ConstructionRepositoryInterface;
 use App\Repositories\ConstructionRepository;
 use App\Repositories\ConstructionEquipmentRepository;
 use App\Interfaces\ConstructionEquipmentRepositoryInterface;
+use App\Repositories\ReportRepository;
+use App\Interfaces\ApproveRepositoryInterface;
+use App\Repositories\ApproveRepository;
+use App\Interfaces\ReportRepositoryInterface;
+use App\Repositories\ApproveItemRepository;
+use App\Interfaces\ApproveItemRepositoryInterface;
+use App\Repositories\ApproveReportRepository;
+use App\Interfaces\ApproveReportRepositoryInterface;
+use App\Interfaces\WorkLogRepositoryInterface;
+use App\Repositories\WorkLogRepository;
+use App\Interfaces\WorkRecordRepositoryInterface;
+use App\Repositories\WorkRecordRepository;
+use App\Interfaces\WorkScheduleRepositoryInterface;
+use App\Repositories\WorkScheduleRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -40,6 +54,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(EquipmentCategoryRepositoryInterface::class, EquipmentCategoryRepository::class);
         $this->app->bind(ConstructionRepositoryInterface::class, ConstructionRepository::class);
         $this->app->bind(ConstructionEquipmentRepositoryInterface::class, ConstructionEquipmentRepository::class);
+        $this->app->bind(ReportRepositoryInterface::class, ReportRepository::class);
+        $this->app->bind(ApproveRepositoryInterface::class, ApproveRepository::class);
+        $this->app->bind(ApproveItemRepositoryInterface::class, ApproveItemRepository::class);
+        $this->app->bind(ApproveReportRepositoryInterface::class, ApproveReportRepository::class);
+        $this->app->bind(WorkLogRepositoryInterface::class, WorkLogRepository::class);
+        $this->app->bind(WorkRecordRepositoryInterface::class, WorkRecordRepository::class);
+        $this->app->bind(WorkScheduleRepositoryInterface::class, WorkScheduleRepository::class);
 
     }
 

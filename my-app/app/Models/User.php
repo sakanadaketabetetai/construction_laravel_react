@@ -47,6 +47,14 @@ class User extends Authenticatable
     }
 
     public function constructions() {
-        return $this->hasMane(Construction::class);
+        return $this->hasMany(Construction::class);
+    }
+
+    public function approve_items(){
+        return $this->hasMany(Approve::class);
+    }
+
+    public function work_logs(){
+        return $this->hasMany(WorkLog::class);
     }
 }
